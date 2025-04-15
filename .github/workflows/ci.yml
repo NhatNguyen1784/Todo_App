@@ -30,9 +30,7 @@ jobs:
           issue: ${{ steps.extract_issue.outputs.ISSUE_KEY }}
           transition: "Done"
         env:
-          JIRA_BASE_URL: https://nguyennhatnguyen.atlassian.net
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_CONFIG_PATH: .jira/config.yml
 
       - name: Notify Slack
         run: |
