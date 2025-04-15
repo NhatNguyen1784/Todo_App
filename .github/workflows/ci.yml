@@ -13,7 +13,7 @@ jobs:
       - run: echo Hello world
 
   jira-update-and-slack:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.event.action == 'closed'
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
           echo "ISSUE_KEY=$issue_key" >> $GITHUB_OUTPUT
 
       - name: Transition Jira issue to Done
-        uses: atlassian/gajira-transition@v2
+        uses: atlassian/gajira-transition@v3
         with:
           issue: ${{ steps.extract_issue.outputs.ISSUE_KEY }}
           transition: "Done"
