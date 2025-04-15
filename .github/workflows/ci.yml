@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        run: echo Hello world
+      - run: echo Hello world
 
   jira-update-and-slack:
     if: github.event.pull_request.merged == true
