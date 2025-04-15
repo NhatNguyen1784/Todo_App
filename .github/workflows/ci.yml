@@ -30,7 +30,7 @@ jobs:
           issue: ${{ steps.extract_issue.outputs.ISSUE_KEY }}
           transition: "Done"
         env:
-          JIRA_CONFIG_PATH: .jira/config.yml
+          JIRA_CONFIG_PATH: .github/jira/config.yml
 
       - name: Notify Slack
         run: |
