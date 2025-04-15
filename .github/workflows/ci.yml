@@ -37,7 +37,7 @@ jobs:
           echo "ISSUE_KEY=$issue_key" >> $GITHUB_OUTPUT
 
       - name: Transition Jira issue to Done
-        uses: atlassian/gajira-transition@v3
+        uses: atlassian/gajira-transition@v2
         with:
           issue: ${{ steps.extract_issue.outputs.ISSUE_KEY }}
           transition: "Done"
