@@ -1,0 +1,55 @@
+name: CI/CD with GitHub, Jira and Slack
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  build-and-test:
+    if: github.event.pull_request.merged != true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  jira-update-and-slack:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Jira issue key from PR title
+        id: extract_issue
+        run: |
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          issue_key=$(echo "${{ github.event.pull_request.title }}" | grep -oE '[A-Z]+-[0-9]+')
+          echo "ISSUE_KEY=$issue_key" >> $GITHUB_OUTPUT
+
+      - name: Transition Jira issue to Done
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.extract_issue.outputs.ISSUE_KEY }}
+          transition: "Done"
+        env:
+          JIRA_BASE_URL: https://nguyennhatnguyen.atlassian.net
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Notify Slack
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"✅ Issue *${{ steps.extract_issue.outputs.ISSUE_KEY }}* đã được đóng thành công (PR đã merge)."}' \
+          $SLACK_WEBHOOK_URL
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
